@@ -6,7 +6,7 @@ import { Menu } from 'lucide-react';
 export function Header() {
   const navLinks = [
     { href: '/what-is-silence', label: 'What is Silence?' },
-    { href: '/pricing', label: 'Pricing' },
+    { href: '/pricing', label: 'Access' },
     { href: '/privacy', label: 'Privacy' },
     { href: '/settings', label: 'Settings' },
   ];

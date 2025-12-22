@@ -46,15 +46,6 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="monthly-notification" className="flex flex-col space-y-1">
-              <span>Monthly Reminder</span>
-              <span className="font-normal leading-snug text-muted-foreground">
-                Get one gentle notification per month.
-              </span>
-            </Label>
-            <Switch id="monthly-notification" checked={monthlyNotification} onCheckedChange={handleMonthlyNotificationChange} />
-          </div>
-          <div className="flex items-center justify-between space-x-2">
             <Label htmlFor="no-end-screen" className="flex flex-col space-y-1">
               <span>Silence With No End Screen</span>
               <span className="font-normal leading-snug text-muted-foreground">
@@ -62,15 +53,6 @@ export default function SettingsPage() {
               </span>
             </Label>
             <Switch id="no-end-screen" checked={noEndScreen} onCheckedChange={handleNoEndScreenChange} />
-          </div>
-          <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="emergency-silence" className="flex flex-col space-y-1">
-              <span>Enable Emergency Silence</span>
-              <span className="font-normal leading-snug text-muted-foreground">
-                Allows starting a session from anywhere.
-              </span>
-            </Label>
-            <Switch id="emergency-silence" disabled />
           </div>
           <div className="flex items-center justify-between space-x-2">
             <Label htmlFor="auto-hide-timer" className="flex flex-col space-y-1">
@@ -82,6 +64,15 @@ export default function SettingsPage() {
             <Switch id="auto-hide-timer" defaultChecked />
           </div>
           <div className="flex items-center justify-between space-x-2">
+            <Label htmlFor="emergency-silence" className="flex flex-col space-y-1">
+              <span>Enable Emergency Silence</span>
+              <span className="font-normal leading-snug text-muted-foreground">
+                Allows starting a session from anywhere.
+              </span>
+            </Label>
+            <Switch id="emergency-silence" disabled />
+          </div>
+          <div className="flex items-center justify-between space-x-2">
             <Label htmlFor="restore-notifications" className="flex flex-col space-y-1">
               <span>Restore notifications after silence</span>
                <span className="font-normal leading-snug text-muted-foreground">
@@ -89,6 +80,15 @@ export default function SettingsPage() {
               </span>
             </Label>
             <Switch id="restore-notifications" defaultChecked disabled />
+          </div>
+          <div className="flex items-center justify-between space-x-2">
+            <Label htmlFor="monthly-notification" className="flex flex-col space-y-1">
+              <span>Monthly Reminder</span>
+              <span className="font-normal leading-snug text-muted-foreground">
+                Get one gentle notification per month.
+              </span>
+            </Label>
+            <Switch id="monthly-notification" checked={monthlyNotification} onCheckedChange={handleMonthlyNotificationChange} />
           </div>
           <Separator />
           <div className="space-y-2">

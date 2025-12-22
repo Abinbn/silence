@@ -28,6 +28,9 @@ export default function PrivacyPage() {
           <p>
             When silence ends, everything returns to normal.
           </p>
+          <p>
+            Silence does not learn from you. It does not adapt. It does not remember you.
+          </p>
           <p className="text-lg text-foreground pt-4">
             You don’t owe us your data. Just your trust.
           </p>

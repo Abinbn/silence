@@ -51,7 +51,7 @@ export default function PricingPage() {
         <Card className="border-accent flex flex-col">
           <CardHeader>
             <CardTitle className="font-headline text-3xl">Paid</CardTitle>
-            <CardDescription>For unlimited peace.</CardDescription>
+            <CardDescription>For uninterrupted silence.</CardDescription>
           </CardHeader>
           <CardContent className="flex-grow space-y-4">
              <p className="text-4xl font-bold">₹1 <span className="text-lg font-normal text-muted-foreground">/ month</span></p>

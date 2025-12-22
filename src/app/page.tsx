@@ -8,14 +8,20 @@ import { useRouter } from 'next/navigation';
 
 type SilenceContext = {
   label: string;
-  duration: number | null; // null for indefinite
+  duration: number;
 };
 
 const silenceContexts: SilenceContext[] = [
   { label: 'For 10 minutes', duration: 10 },
   { label: 'Before sleep', duration: 30 },
   { label: 'When overwhelmed', duration: 60 },
-  { label: 'Until I choose to stop', duration: null },
+];
+
+const endScreenMessages = [
+  "You survived without noise.",
+  "Nothing was required of you.",
+  "The world waited.",
+  "You were not needed anywhere."
 ];
 
 export default function Home() {
@@ -23,6 +29,7 @@ export default function Home() {
   const [view, setView] = useState<'landing' | 'session' | 'end'>('landing');
   const [duration, setDuration] = useState<number | null>(0);
   const [showEndScreen, setShowEndScreen] = useState(true);
+  const [endMessage, setEndMessage] = useState(endScreenMessages[0]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -50,10 +57,27 @@ export default function Home() {
     const noEndScreen = localStorage.getItem('no-end-screen-enabled') === 'true';
     setShowEndScreen(!noEndScreen);
   }, [toast]);
+  
+  const selectEndMessage = () => {
+    const lastMessageDate = localStorage.getItem('last-end-message-date');
+    const now = new Date().toDateString();
+    
+    if (lastMessageDate !== now) {
+      const randomIndex = Math.floor(Math.random() * endScreenMessages.length);
+      const newMessage = endScreenMessages[randomIndex];
+      setEndMessage(newMessage);
+      localStorage.setItem('last-end-message', newMessage);
+      localStorage.setItem('last-end-message-date', now);
+    } else {
+      const storedMessage = localStorage.getItem('last-end-message');
+      setEndMessage(storedMessage || endScreenMessages[0]);
+    }
+  }
 
   const handleStart = (minutes: number | null) => {
     setDuration(minutes);
     setView('session');
+    selectEndMessage();
   };
 
   const handleFinish = () => {
@@ -79,7 +103,7 @@ export default function Home() {
   if (view === 'end') {
     return (
       <div className="flex flex-col items-center justify-center flex-grow text-center p-4 animate-in fade-in duration-1000">
-        <h1 className="text-4xl font-headline mb-4">You survived without noise.</h1>
+        <h1 className="text-4xl font-headline mb-4">{endMessage}</h1>
         <Button onClick={handleClose} variant="secondary" size="lg">
           Close
         </Button>
@@ -97,22 +121,32 @@ export default function Home() {
         <br />
         You just need silence.
       </p>
-      <p className="text-sm text-muted-foreground/70 mb-12">
-        Silence is not something you earn. It’s something you allow.
-      </p>
-      <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
+      <div className="mb-12">
+        <Button
+          onClick={() => handleStart(null)}
+          size="lg"
+          className="h-14 px-12 text-lg"
+        >
+          Enter Silence
+        </Button>
+      </div>
+      <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 mb-12">
         {silenceContexts.map((context) => (
           <Button
             key={context.label}
             onClick={() => handleStart(context.duration)}
             variant="secondary"
-            size="lg"
           >
-            {context.label === 'Until I choose to stop' ? 'Enter Silence' : context.label}
+            {context.label}
           </Button>
         ))}
       </div>
-       <p className="text-xs text-muted-foreground mt-12">
+       <p className="text-sm text-muted-foreground/70 mb-4">
+        Silence isn&apos;t something you earn.
+        <br />
+        It&apos;s something you allow.
+      </p>
+       <p className="text-xs text-muted-foreground mt-8">
         You can leave silence at any moment. Silence is not confinement.
       </p>
     </div>
