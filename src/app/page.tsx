@@ -4,10 +4,25 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { SilenceSession } from '@/components/SilenceSession';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+
+type SilenceContext = {
+  label: string;
+  duration: number | null; // null for indefinite
+};
+
+const silenceContexts: SilenceContext[] = [
+  { label: 'For 10 minutes', duration: 10 },
+  { label: 'Before sleep', duration: 30 },
+  { label: 'When overwhelmed', duration: 60 },
+  { label: 'Until I choose to stop', duration: null },
+];
 
 export default function Home() {
+  const router = useRouter();
   const [view, setView] = useState<'landing' | 'session' | 'end'>('landing');
-  const [duration, setDuration] = useState(0); // in minutes
+  const [duration, setDuration] = useState<number | null>(0);
+  const [showEndScreen, setShowEndScreen] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -25,30 +40,40 @@ export default function Home() {
           localStorage.setItem('last-monthly-notification', now.toISOString());
         }
       } else {
-        // First time enabling, show it and set the date
         toast({
           description: "If the internet feels loud today, silence is here.",
         });
         localStorage.setItem('last-monthly-notification', now.toISOString());
       }
     }
+    
+    const noEndScreen = localStorage.getItem('no-end-screen-enabled') === 'true';
+    setShowEndScreen(!noEndScreen);
   }, [toast]);
 
-  const handleStart = (minutes: number) => {
+  const handleStart = (minutes: number | null) => {
     setDuration(minutes);
     setView('session');
   };
 
   const handleFinish = () => {
-    setView('end');
+    if (showEndScreen) {
+      setView('end');
+    } else {
+      setView('landing');
+    }
   };
+  
+  const handleEndFromSession = () => {
+    setView('landing');
+  }
 
   const handleClose = () => {
     setView('landing');
   };
 
   if (view === 'session') {
-    return <SilenceSession duration={duration} onFinish={handleFinish} />;
+    return <SilenceSession duration={duration} onFinish={handleFinish} onEndFromSession={handleEndFromSession} />;
   }
 
   if (view === 'end') {
@@ -72,16 +97,17 @@ export default function Home() {
         <br />
         You just need silence.
       </p>
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Button onClick={() => handleStart(10)} variant="secondary" size="lg">
-          10 minutes
-        </Button>
-        <Button onClick={() => handleStart(30)} variant="secondary" size="lg">
-          30 minutes
-        </Button>
-        <Button onClick={() => handleStart(60)} variant="secondary" size="lg">
-          60 minutes
-        </Button>
+      <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
+        {silenceContexts.map((context) => (
+          <Button
+            key={context.label}
+            onClick={() => handleStart(context.duration)}
+            variant="secondary"
+            size="lg"
+          >
+            {context.label}
+          </Button>
+        ))}
       </div>
     </div>
   );

@@ -10,10 +10,14 @@ import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
   const [monthlyNotification, setMonthlyNotification] = useState(false);
+  const [noEndScreen, setNoEndScreen] = useState(false);
 
   useEffect(() => {
-    const savedState = localStorage.getItem('monthly-notification-enabled') === 'true';
-    setMonthlyNotification(savedState);
+    const monthlySavedState = localStorage.getItem('monthly-notification-enabled') === 'true';
+    setMonthlyNotification(monthlySavedState);
+    
+    const noEndScreenSavedState = localStorage.getItem('no-end-screen-enabled') === 'true';
+    setNoEndScreen(noEndScreenSavedState);
   }, []);
 
   const handleMonthlyNotificationChange = (checked: boolean) => {
@@ -23,6 +27,11 @@ export default function SettingsPage() {
       // Set initial date when enabled for the first time
       localStorage.setItem('last-monthly-notification', new Date().toISOString());
     }
+  };
+
+  const handleNoEndScreenChange = (checked: boolean) => {
+    setNoEndScreen(checked);
+    localStorage.setItem('no-end-screen-enabled', String(checked));
   };
 
 
@@ -44,6 +53,15 @@ export default function SettingsPage() {
               </span>
             </Label>
             <Switch id="monthly-notification" checked={monthlyNotification} onCheckedChange={handleMonthlyNotificationChange} />
+          </div>
+          <div className="flex items-center justify-between space-x-2">
+            <Label htmlFor="no-end-screen" className="flex flex-col space-y-1">
+              <span>Silence With No End Screen</span>
+              <span className="font-normal leading-snug text-muted-foreground">
+                For those who want pure absence.
+              </span>
+            </Label>
+            <Switch id="no-end-screen" checked={noEndScreen} onCheckedChange={handleNoEndScreenChange} />
           </div>
           <div className="flex items-center justify-between space-x-2">
             <Label htmlFor="emergency-silence" className="flex flex-col space-y-1">
