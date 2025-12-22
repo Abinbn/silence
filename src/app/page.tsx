@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { SilenceSession } from '@/components/SilenceSession';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 
 type SilenceContext = {
   label: string;
@@ -25,12 +24,20 @@ const endScreenMessages = [
 ];
 
 export default function Home() {
-  const router = useRouter();
   const [view, setView] = useState<'landing' | 'session' | 'end'>('landing');
   const [duration, setDuration] = useState<number | null>(0);
   const [showEndScreen, setShowEndScreen] = useState(true);
   const [endMessage, setEndMessage] = useState(endScreenMessages[0]);
+  const [showContent, setShowContent] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowContent(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const monthlyNotificationEnabled = localStorage.getItem('monthly-notification-enabled') === 'true';
@@ -112,43 +119,47 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center flex-grow text-center p-4 animate-in fade-in duration-1000">
-      <h1 className="text-6xl md:text-8xl font-bold font-headline mb-4 tracking-tighter">
+    <div className="flex flex-col items-center justify-center flex-grow text-center p-4">
+      <h1 className="text-6xl md:text-8xl font-bold font-headline mb-4 tracking-tighter animate-in fade-in duration-1000">
         SILENCE
       </h1>
-      <p className="text-muted-foreground mb-4 max-w-sm">
-        You don’t need to do anything.
-        <br />
-        You just need silence.
-      </p>
-      <div className="mb-12">
-        <Button
-          onClick={() => handleStart(null)}
-          size="lg"
-          className="h-14 px-12 text-lg"
-        >
-          Enter Silence
-        </Button>
-      </div>
-      <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 mb-12">
-        {silenceContexts.map((context) => (
-          <Button
-            key={context.label}
-            onClick={() => handleStart(context.duration)}
-            variant="secondary"
-          >
-            {context.label}
-          </Button>
-        ))}
-      </div>
-       <p className="text-sm text-muted-foreground/70 mb-4">
-        Silence isn&apos;t something you earn.
-        <br />
-        It&apos;s something you allow.
-      </p>
-       <p className="text-xs text-muted-foreground mt-8">
-        You can leave silence at any moment. Silence is not confinement.
-      </p>
+      {showContent && (
+        <div className="flex flex-col items-center text-center animate-in fade-in duration-1000">
+          <p className="text-muted-foreground mb-4 max-w-sm">
+            You don’t need to do anything.
+            <br />
+            You just need silence.
+          </p>
+          <div className="mb-12">
+            <Button
+              onClick={() => handleStart(null)}
+              size="lg"
+              className="h-14 px-12 text-lg"
+            >
+              Enter Silence
+            </Button>
+          </div>
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 mb-12">
+            {silenceContexts.map((context) => (
+              <Button
+                key={context.label}
+                onClick={() => handleStart(context.duration)}
+                variant="secondary"
+              >
+                {context.label}
+              </Button>
+            ))}
+          </div>
+           <p className="text-sm text-muted-foreground/70 mb-4">
+            Silence isn&apos;t something you earn.
+            <br />
+            It&apos;s something you allow.
+          </p>
+           <p className="text-xs text-muted-foreground mt-8">
+            You can leave silence at any moment. Silence is not confinement.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
