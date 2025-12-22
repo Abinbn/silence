@@ -92,10 +92,13 @@ export default function Home() {
       <h1 className="text-6xl md:text-8xl font-bold font-headline mb-4 tracking-tighter">
         SILENCE
       </h1>
-      <p className="text-muted-foreground mb-12 max-w-sm">
+      <p className="text-muted-foreground mb-4 max-w-sm">
         You don’t need to do anything.
         <br />
         You just need silence.
+      </p>
+      <p className="text-sm text-muted-foreground/70 mb-12">
+        Silence is not something you earn. It’s something you allow.
       </p>
       <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
         {silenceContexts.map((context) => (
@@ -105,10 +108,13 @@ export default function Home() {
             variant="secondary"
             size="lg"
           >
-            {context.label}
+            {context.label === 'Until I choose to stop' ? 'Enter Silence' : context.label}
           </Button>
         ))}
       </div>
+       <p className="text-xs text-muted-foreground mt-12">
+        You can leave silence at any moment. Silence is not confinement.
+      </p>
     </div>
   );
 }

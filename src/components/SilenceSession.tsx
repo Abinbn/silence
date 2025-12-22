@@ -13,7 +13,19 @@ type SilenceSessionProps = {
 export function SilenceSession({ duration, onFinish, onEndFromSession }: SilenceSessionProps) {
   const [timeLeft, setTimeLeft] = useState(duration ? duration * 60 : Infinity);
   const [opacity, setOpacity] = useState(1);
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const isInfinite = duration === null;
+  const initialTime = duration ? duration * 60 : null;
+
+  useEffect(() => {
+    // Threshold moment: fade in
+    const fadeInTimer = setTimeout(() => {
+      // Opacity is already 1 from initial state, this is for logic timing
+    }, 2000);
+    
+    return () => clearTimeout(fadeInTimer);
+  }, []);
+
 
   useEffect(() => {
     try {
@@ -37,6 +49,16 @@ export function SilenceSession({ duration, onFinish, onEndFromSession }: Silence
     }
 
     if (isInfinite) return;
+    
+    // Forgive quick exits
+    if (initialTime && timeLeft < initialTime - 10) {
+      //
+    }
+
+    // Soft Exit
+    if (initialTime && timeLeft <= 10 && !isFadingOut) {
+       setIsFadingOut(true);
+    }
 
     if (timeLeft <= 0) {
       onEnd();
@@ -48,9 +70,10 @@ export function SilenceSession({ duration, onFinish, onEndFromSession }: Silence
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft, onFinish, isInfinite]);
+  }, [timeLeft, onFinish, isInfinite, initialTime, isFadingOut]);
 
   useEffect(() => {
+    // Auto-hide timer
     const timer = setTimeout(() => {
       setOpacity(0.05);
     }, 10000); // Fades after 10 seconds
@@ -67,6 +90,10 @@ export function SilenceSession({ duration, onFinish, onEndFromSession }: Silence
   };
   
   const handleEndClick = () => {
+     if (initialTime && timeLeft > initialTime - 10) {
+      onEndFromSession();
+      return;
+    }
     try {
       if (navigator.vibrate) {
         navigator.vibrate(100); // Soft vibration on end
@@ -78,29 +105,39 @@ export function SilenceSession({ duration, onFinish, onEndFromSession }: Silence
   }
 
   return (
-    <div className="flex items-center justify-center flex-grow bg-primary animate-in fade-in duration-1000 relative">
+    <div 
+      className={`flex items-center justify-center flex-grow bg-black animate-in fade-in duration-[2000ms] relative ${isFadingOut ? 'transition-colors duration-[10000ms] ease-in-out bg-opacity-0' : ''}`}
+    >
       {isInfinite && (
          <Button
             variant="ghost"
-            size="icon"
-            className="absolute top-4 right-4 text-accent hover:text-accent-foreground z-20"
+            className="absolute bottom-10 text-accent hover:text-accent-foreground z-20 uppercase tracking-widest"
             onClick={handleEndClick}
-            aria-label="End Silence"
+            aria-label="Exit Silence"
           >
-            <X size={32} />
+            Exit Silence
         </Button>
       )}
       <h1
         className="text-8xl md:text-9xl font-mono text-accent transition-opacity duration-1000 ease-in-out select-none"
         style={{ opacity }}
         onMouseEnter={() => setOpacity(1)}
-        onMouseLeave={() => {
-            if (opacity !== 1) setOpacity(0.05);
-        }}
+        onMouseLeave={() => setOpacity(0.05)}
         onClick={() => setOpacity(opacity === 1 ? 0.05 : 1)}
       >
         {formatTime(timeLeft)}
       </h1>
+       {!isInfinite && (
+         <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 text-accent hover:text-accent-foreground z-20"
+            onClick={handleEndClick}
+            aria-label="Exit Silence"
+          >
+            <X size={32} />
+        </Button>
+      )}
     </div>
   );
 }
