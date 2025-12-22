@@ -1,12 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { SilenceSession } from '@/components/SilenceSession';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Home() {
   const [view, setView] = useState<'landing' | 'session' | 'end'>('landing');
   const [duration, setDuration] = useState(0); // in minutes
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const monthlyNotificationEnabled = localStorage.getItem('monthly-notification-enabled') === 'true';
+    if (monthlyNotificationEnabled) {
+      const lastNotificationDate = localStorage.getItem('last-monthly-notification');
+      const now = new Date();
+      if (lastNotificationDate) {
+        const lastDate = new Date(lastNotificationDate);
+        const oneMonth = 30 * 24 * 60 * 60 * 1000; // Approx 30 days
+        if (now.getTime() - lastDate.getTime() > oneMonth) {
+          toast({
+            description: "If the internet feels loud today, silence is here.",
+          });
+          localStorage.setItem('last-monthly-notification', now.toISOString());
+        }
+      } else {
+        // First time enabling, show it and set the date
+        toast({
+          description: "If the internet feels loud today, silence is here.",
+        });
+        localStorage.setItem('last-monthly-notification', now.toISOString());
+      }
+    }
+  }, [toast]);
 
   const handleStart = (minutes: number) => {
     setDuration(minutes);

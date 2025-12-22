@@ -1,11 +1,31 @@
+'use client';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
+  const [monthlyNotification, setMonthlyNotification] = useState(false);
+
+  useEffect(() => {
+    const savedState = localStorage.getItem('monthly-notification-enabled') === 'true';
+    setMonthlyNotification(savedState);
+  }, []);
+
+  const handleMonthlyNotificationChange = (checked: boolean) => {
+    setMonthlyNotification(checked);
+    localStorage.setItem('monthly-notification-enabled', String(checked));
+    if (checked && !localStorage.getItem('last-monthly-notification')) {
+      // Set initial date when enabled for the first time
+      localStorage.setItem('last-monthly-notification', new Date().toISOString());
+    }
+  };
+
+
   return (
     <div className="flex-grow flex items-center justify-center p-4">
       <Card className="max-w-2xl w-full animate-in fade-in duration-1000">
@@ -16,6 +36,15 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          <div className="flex items-center justify-between space-x-2">
+            <Label htmlFor="monthly-notification" className="flex flex-col space-y-1">
+              <span>Monthly Reminder</span>
+              <span className="font-normal leading-snug text-muted-foreground">
+                Get one gentle notification per month.
+              </span>
+            </Label>
+            <Switch id="monthly-notification" checked={monthlyNotification} onCheckedChange={handleMonthlyNotificationChange} />
+          </div>
           <div className="flex items-center justify-between space-x-2">
             <Label htmlFor="emergency-silence" className="flex flex-col space-y-1">
               <span>Enable Emergency Silence</span>
